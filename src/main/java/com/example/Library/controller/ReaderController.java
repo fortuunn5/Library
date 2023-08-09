@@ -1,5 +1,6 @@
 package com.example.Library.controller;
 
+import com.example.Library.dto.ReaderDto;
 import com.example.Library.model.Reader;
 import com.example.Library.service.ReaderService;
 import lombok.RequiredArgsConstructor;
@@ -7,6 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -32,20 +34,26 @@ public class ReaderController {
     }
 
     @GetMapping("/readers/{id}")
-    public ResponseEntity<Reader> readReader(@PathVariable(name="id") Long id) {
+    public ResponseEntity<ReaderDto> readReader(@PathVariable(name="id") Long id) {
         if(readerService.read(id).isPresent()) {
-            readerService.read(id);
-            return ResponseEntity.ok(readerService.read(id).orElseThrow());
+            Reader reader = readerService.read(id).orElseThrow();
+            ReaderDto readerDto = new ReaderDto(reader.getId(), reader.getFio(), reader.getEmail(), reader.getUsername(), reader.getIsArchived());
+            return ResponseEntity.ok(readerDto);
         }
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
     @GetMapping("/readers")
-    public ResponseEntity<List<Reader>> readReaders() {
+    public ResponseEntity<List<ReaderDto>> readReaders() {
         if(!readerService.readAll().isEmpty()) {
-            //readerService.readAll();
-            //return new ResponseEntity<>(HttpStatus.OK);
-            return ResponseEntity.ok(readerService.readAll());
+            List<Reader> readers = readerService.readAll();
+            List<ReaderDto> readerDtos = new ArrayList<>();
+            for(int i=0; i<readers.size(); i++) {
+                readerDtos.add(new ReaderDto(readers.get(i).getId(), readers.get(i).getFio(), readers.get(i).getEmail(), readers.get(i).getUsername(), readers.get(i).getIsArchived()));
+            }
+
+            return ResponseEntity.ok(readerDtos);
+            //return ResponseEntity.ok(readerService.readAll());
         }
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }

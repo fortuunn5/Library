@@ -37,8 +37,12 @@ public class Reader implements UserDetails {
     @Column(nullable = false)
     private String role = "ROLE_USER";
 
+    @Column(nullable = false)
+    private Boolean isArchived = false;
+
     @OneToMany(mappedBy="reader")
-    private Set<Logbook> logbooks = null;
+    //@JoinColumn(name="reader_id")
+    private Set<Logbook> logbooks/* = null*/;
 
     public Reader(@NonNull String fio, @NonNull String email, String username, String password) {
         this.fio = fio;

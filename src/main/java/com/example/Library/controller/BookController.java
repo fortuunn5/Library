@@ -1,5 +1,6 @@
 package com.example.Library.controller;
 
+import com.example.Library.dto.BookDto;
 import com.example.Library.model.Book;
 import com.example.Library.service.BookService;
 import lombok.RequiredArgsConstructor;
@@ -7,6 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -35,19 +37,24 @@ public class BookController {
     }
 
     @GetMapping("/books/{idBook}")
-    public ResponseEntity<Book> readBook(@PathVariable(name="idBook") Long id) {
+    public ResponseEntity<BookDto> readBook(@PathVariable(name="idBook") Long id) {
         if(bookService.read(id).isPresent()) {
-            bookService.read(id);
-            return ResponseEntity.ok(bookService.read(id).orElseThrow());
+            Book book = bookService.read(id).orElseThrow();
+            BookDto bookDto = new BookDto(book.getId(), book.getName(), book.getAuthor(), book.getYear(), book.getIsArchived());
+            return ResponseEntity.ok(bookDto);
         }
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
     @GetMapping("/books")
-    public ResponseEntity<List<Book>> readBooks() {
+    public ResponseEntity<List<BookDto>> readBooks() {
         if(!bookService.readAll().isEmpty()) {
-            //bookService.readAll();
-            return ResponseEntity.ok(bookService.readAll());
+            List<Book> books = bookService.readAll();
+            List<BookDto> bookDtos = new ArrayList<>();
+            for(int i=0; i<books.size(); i++) {
+                bookDtos.add(new BookDto(books.get(i).getId(), books.get(i).getName(),books.get(i).getAuthor(), books.get(i).getYear(), books.get(i).getIsArchived()));
+            }
+            return ResponseEntity.ok(bookDtos);
         }
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }

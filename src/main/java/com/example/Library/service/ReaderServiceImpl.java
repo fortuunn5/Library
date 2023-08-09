@@ -1,5 +1,6 @@
 package com.example.Library.service;
 
+import com.example.Library.dto.ReaderDto;
 import com.example.Library.model.Reader;
 import com.example.Library.repository.ReaderRepository;
 import lombok.RequiredArgsConstructor;
@@ -15,7 +16,6 @@ public class ReaderServiceImpl implements ReaderService {
 
     @Override
     public void create(Reader newReader) {
-        //readerRepository.save(newReader);
 
         List<Reader> readers = readerRepository.findAll();
         boolean isExist=false;

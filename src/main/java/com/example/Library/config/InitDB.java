@@ -73,7 +73,16 @@ public class InitDB {
         Book book2 = bookService.read(3L).orElseThrow();
         Book book3 = bookService.read(4L).orElseThrow();
 
-        logbookService.create(new Logbook(reader, book, new GregorianCalendar(2022, Calendar.MAY, 11),
+        logbookService.create(new Logbook(reader, book, new GregorianCalendar(2022, Calendar.MAY, 9),
                 new GregorianCalendar(2022, Calendar.MAY, 23), true));
+
+        logbookService.create(new Logbook(reader1, book1, new GregorianCalendar(2019, Calendar.AUGUST, 4),
+                                                          new GregorianCalendar(2019, Calendar.SEPTEMBER, 8), true));
+
+        logbookService.create(new Logbook(reader2, book2, new GregorianCalendar(2007, Calendar.APRIL, 9),
+                                                          new GregorianCalendar(2007, Calendar.MAY, 13), true));
+
+        logbookService.create(new Logbook(reader2, book3, new GregorianCalendar(2021, Calendar.DECEMBER, 21),
+                                                          new GregorianCalendar(2022, Calendar.JANUARY, 30), true));
     }
 }

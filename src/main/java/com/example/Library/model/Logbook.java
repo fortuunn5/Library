@@ -4,36 +4,37 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.util.Calendar;
+import java.util.GregorianCalendar;
 import java.util.Objects;
 
 @Entity
 @Getter
 @Setter
-//@NoArgsConstructor
+@NoArgsConstructor
 @AllArgsConstructor
-@RequiredArgsConstructor
+//@RequiredArgsConstructor
 public class Logbook {
     @EmbeddedId
     private LogbookKey id= new LogbookKey();
 
     @ManyToOne
     @MapsId("readerId")
-    @JoinColumn(name="reader-id")
-    private Reader reader;
+    @JoinColumn(name="reader_id")
+    Reader reader;
 
     @ManyToOne
     @MapsId("bookId")
-    @JoinColumn(name="book-id")
-    private Book book;
+    @JoinColumn(name="book_id")
+    Book book;
 
     @Column(name="issueDate", nullable = false)
-    private Calendar issueDate;
+    private Calendar issueDate = new GregorianCalendar();
 
     @Column(name="deliveryDate", nullable = false)
-    private Calendar deliveryDate;
+    private Calendar deliveryDate = new GregorianCalendar();
 
     @Column(nullable = false)
-    private Boolean isArchived = false;
+    private Boolean isArchived /*= false*/;
 
     public Logbook(Reader reader, Book book, Calendar issueDate, Calendar deliveryDate, Boolean isArchived) {
         this.reader = reader;

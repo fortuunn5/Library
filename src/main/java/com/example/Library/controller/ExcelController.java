@@ -1,9 +1,7 @@
 package com.example.Library.controller;
 
-import com.example.Library.ReportExcelStreamWriter;
-import jakarta.websocket.server.PathParam;
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
+import com.example.Library.service.ExcelService;
+import com.example.Library.dto.CalendarDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,12 +13,12 @@ import java.io.IOException;
 @RequiredArgsConstructor
 //@AllArgsConstructor
 public class ExcelController {
-    private final ReportExcelStreamWriter reportExcelStreamWriter;
+    private final ExcelService reportExcelStreamWriter;
 
 
     @GetMapping("/excel")
-    public ResponseEntity<?> sendExcel() throws IOException {
-        reportExcelStreamWriter.write();
+    public ResponseEntity<?> sendExcel(@RequestBody CalendarDto calendarDto) throws IOException {
+        reportExcelStreamWriter.write(calendarDto);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 

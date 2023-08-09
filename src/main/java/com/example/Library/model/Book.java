@@ -25,9 +25,12 @@ public class Book {
     private String author;
     @Column(name="year", nullable = false)
     private Integer year;
+    @Column(nullable = false)
+    private Boolean isArchived = false;
 
     @OneToMany(mappedBy = "book")
-    private Set<Logbook> logbooks;
+    //@JoinColumn(name="book_id")
+    private Set<Logbook> logbooks/*=null*/;
 
     public Book(@NonNull String name, String author, Integer year) {
         this.name = name;
@@ -40,11 +43,11 @@ public class Book {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Book book = (Book) o;
-        return year == book.year && Objects.equals(name, book.name) && Objects.equals(author, book.author);
+        return Objects.equals(name, book.name) && Objects.equals(author, book.author) && Objects.equals(year, book.year) && Objects.equals(isArchived, book.isArchived);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, author, year);
+        return Objects.hash(name, author, year, isArchived);
     }
 }
