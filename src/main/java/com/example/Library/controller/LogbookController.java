@@ -6,27 +6,28 @@ import com.example.Library.dto.ReaderDto;
 import com.example.Library.model.Logbook;
 import com.example.Library.model.LogbookKey;
 import com.example.Library.model.Reader;
-import com.example.Library.service.BookService;
-import com.example.Library.service.LogbookService;
-import com.example.Library.service.ReaderService;
+import com.example.Library.service.interfaces.LogbookService;
+import com.example.Library.service.interfaces.ReaderService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @RestController
+@RequestMapping("/logbooks")
 @RequiredArgsConstructor
 public class LogbookController {
     private final LogbookService logbookService;
     private final ReaderService readerService;
-    private final BookService bookService;
+    //private final BookService bookService;
 
-    @PostMapping("/logbooks")
+    @PostMapping
     public ResponseEntity<?> createLogbook(@RequestBody Logbook newLogbook) {
-
         List<Logbook> logbooks = logbookService.readAll();
         for(int i=0; i<logbooks.size(); i++) {
             if(logbooks.get(i).getReader().equals(newLogbook.getReader())
@@ -37,39 +38,32 @@ public class LogbookController {
                 return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
             }
         }
+        if(!newLogbook.getReader().getIsArchived() || !newLogbook.getBook().getIsArchived())
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         logbookService.create(newLogbook);
         return new ResponseEntity<>(HttpStatus.CREATED);
-
-        /*if(logbookService.read(newLogbook.getId()).isEmpty()) {
-            logbookService.create(newLogbook);
-            return new ResponseEntity<>(HttpStatus.OK);
-        }
-        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);*/
     }
 
-    @GetMapping("/logbooks/{id}")
-    public ResponseEntity<LogbookDto> readLogbook(@PathVariable(name="id") LogbookKey id) {
+    @GetMapping
+    public ResponseEntity<LogbookDto> readLogbook(@RequestBody LogbookKey id) {
         if(logbookService.read(id).isPresent()) {
             Logbook logbook = logbookService.read(id).orElseThrow();
             ReaderDto readerDto = new ReaderDto(logbook.getReader().getId(),
-                                                logbook.getReader().getFio(),
-                                                logbook.getReader().getEmail(),
-                                                logbook.getReader().getUsername(),
-                                                logbook.getReader().getIsArchived());
+                    logbook.getReader().getFio(),
+                    logbook.getReader().getEmail(),
+                    logbook.getReader().getUsername(),
+                    logbook.getReader().getIsArchived());
             BookDto bookDto = new BookDto(logbook.getBook().getId(),
-                                          logbook.getBook().getName(),
-                                          logbook.getBook().getAuthor(),
-                                          logbook.getBook().getYear(),
-                                          logbook.getBook().getIsArchived());
+                    logbook.getBook().getName(),
+                    logbook.getBook().getAuthor(),
+                    logbook.getBook().getYear(),
+                    logbook.getBook().getIsArchived());
             return ResponseEntity.ok(new LogbookDto(logbook.getId(), readerDto, bookDto, logbook.getIssueDate(), logbook.getDeliveryDate(), logbook.getIsArchived()));
-
-            //logbookService.read(id);
-            //return ResponseEntity.ok(logbookService.read(id).orElseThrow());
         }
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
-    @GetMapping("/logbooks")
+    @GetMapping("/all")
     public ResponseEntity<List<LogbookDto>> readLogbooks() {
         if(!logbookService.readAll().isEmpty()) {
             List<Logbook> logbooks = logbookService.readAll();
@@ -106,7 +100,6 @@ public class LogbookController {
                         logbooks.get(i).getDeliveryDate(),
                         logbooks.get(i).getIsArchived()));
             }
-
             return ResponseEntity.ok(logbookDtos);
             //bookService.readAll();
             //return ResponseEntity.ok(logbookService.readAll());
@@ -114,36 +107,41 @@ public class LogbookController {
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
-    public ResponseEntity<List<Logbook>> readReadersLogbooks(@PathVariable(name="id") Long id) {
-        Reader reader = readerService.read(id).orElseThrow();
-        ReaderDto readerDto = new ReaderDto(reader.getId(), reader.getFio(), reader.getEmail(), reader.getUsername(), reader.getIsArchived());
-        List<Logbook> logbooks = logbookService.readAll();
-        List<Logbook> cur;
-        List<LogbookDto> logbookDtos=new ArrayList<>();
-        for(int i=0; i<logbooks.size(); i++) {
-            if(logbooks.get(i).getReader().equals(reader)) {
-                LogbookDto logbookDto = new LogbookDto()
+    @GetMapping("/user")
+    public ResponseEntity<List<LogbookDto>> readReadersLogbooks(/*@PathVariable(name="id") Long id*/) {
+        //if(readerService.read(id).isPresent()) {
+            UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            Reader reader = readerService.readByUsername(userDetails.getUsername());
+            //Reader reader = readerService.read(id).orElseThrow();
+            ReaderDto readerDto = new ReaderDto(reader.getId(), reader.getFio(), reader.getEmail(), reader.getUsername(), reader.getIsArchived());
+            List<Logbook> logbooks = logbookService.readReadersLogbooks(reader);
+            List<LogbookDto> logbookDtoList = new ArrayList<>();
+
+            for(int i=0; i<logbooks.size(); i++) {
+                BookDto bookDto = new BookDto(logbooks.get(i).getBook().getId(), logbooks.get(i).getBook().getName(),
+                        logbooks.get(i).getBook().getAuthor(), logbooks.get(i).getBook().getYear(), logbooks.get(i).getBook().getIsArchived());
+                logbookDtoList.add(new LogbookDto(logbooks.get(i).getId(),
+                        readerDto, bookDto,
+                        logbooks.get(i).getIssueDate(),
+                        logbooks.get(i).getDeliveryDate(),
+                        logbooks.get(i).getIsArchived()));
             }
-        }
-
-
-        //for(int i=0; i<reader.)
+            return ResponseEntity.ok(logbookDtoList);
+        //}
+        //return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
-    @PutMapping("/logbooks/{id}")
-    public ResponseEntity<?> updateLogbook(@PathVariable(name = "id") LogbookKey id, Logbook newLogbook) {
-        if (id.equals(newLogbook.getId())) {
-            if (logbookService.read(id).isPresent()) {
-                logbookService.update(newLogbook);
-                return new ResponseEntity<>(HttpStatus.OK);
-            }
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    @PutMapping
+    public ResponseEntity<?> updateLogbook(@RequestBody Logbook newLogbook) {
+        if (logbookService.read(newLogbook.getId()).isPresent()) {
+            logbookService.update(newLogbook);
+            return new ResponseEntity<>(HttpStatus.OK);
         }
-        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
-    @DeleteMapping("/logbooks/{id}")
-    public ResponseEntity<?> deleteLogbook(@PathVariable(name = "id") LogbookKey id) {
+    @DeleteMapping
+    public ResponseEntity<?> deleteLogbook(@RequestBody LogbookKey id) {
         if(logbookService.read(id).isPresent()) {
             logbookService.delete(id);
             return new ResponseEntity<>(HttpStatus.OK);

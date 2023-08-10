@@ -12,10 +12,6 @@ import lombok.Setter;
 public class CalendarDto {
     private int month;
     private int year;
-    private int day=3;
 
-    public CalendarDto(int month, int year) {
-        this.month = month;
-        this.year = year;
-    }
+
 }

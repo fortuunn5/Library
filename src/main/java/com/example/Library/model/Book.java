@@ -12,7 +12,6 @@ import java.util.Set;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-//@RequiredArgsConstructor
 public class Book {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -29,13 +28,19 @@ public class Book {
     private Boolean isArchived = false;
 
     @OneToMany(mappedBy = "book")
-    //@JoinColumn(name="book_id")
-    private Set<Logbook> logbooks/*=null*/;
+    private Set<Logbook> logbooks;
 
     public Book(@NonNull String name, String author, Integer year) {
         this.name = name;
         this.author = author;
         this.year = year;
+    }
+
+    public Book(@NonNull String name, String author, Integer year, Boolean isArchived) {
+        this.name = name;
+        this.author = author;
+        this.year = year;
+        this.isArchived = isArchived;
     }
 
     @Override

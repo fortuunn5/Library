@@ -1,4 +1,4 @@
-package com.example.Library.service;
+package com.example.Library.service.interfaces;
 
 import com.example.Library.dto.BookDto;
 import com.example.Library.model.Book;

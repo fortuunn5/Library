@@ -41,8 +41,7 @@ public class Reader implements UserDetails {
     private Boolean isArchived = false;
 
     @OneToMany(mappedBy="reader")
-    //@JoinColumn(name="reader_id")
-    private Set<Logbook> logbooks/* = null*/;
+    private Set<Logbook> logbooks;
 
     public Reader(@NonNull String fio, @NonNull String email, String username, String password) {
         this.fio = fio;
@@ -51,7 +50,22 @@ public class Reader implements UserDetails {
         this.password = password;
     }
 
+    public Reader(@NonNull String fio, @NonNull String email, String username, String password, String role) {
+        this.fio = fio;
+        this.email = email;
+        this.username = username;
+        this.password = password;
+        this.role = role;
+    }
 
+    public Reader(@NonNull String fio, @NonNull String email, String username, String password, String role, Boolean isArchived) {
+        this.fio = fio;
+        this.email = email;
+        this.username = username;
+        this.password = password;
+        this.role = role;
+        this.isArchived = isArchived;
+    }
 
     @Override
     public boolean equals(Object o) {

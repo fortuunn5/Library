@@ -1,8 +1,8 @@
-package com.example.Library.service;
+package com.example.Library.service.impl;
 
-import com.example.Library.dto.ReaderDto;
 import com.example.Library.model.Reader;
 import com.example.Library.repository.ReaderRepository;
+import com.example.Library.service.interfaces.ReaderService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -17,14 +17,7 @@ public class ReaderServiceImpl implements ReaderService {
     @Override
     public void create(Reader newReader) {
 
-        List<Reader> readers = readerRepository.findAll();
-        boolean isExist=false;
-        for(int i=0; i<readers.size(); i++) {
-            if(readers.get(i).getEmail().equals(newReader.getEmail())) {
-                isExist=true;
-            }
-        }
-        if(!isExist) {
+        if(readerRepository.findByEmail(newReader.getEmail()).isEmpty()) {
             readerRepository.save(newReader);
         }
 
@@ -57,18 +50,32 @@ public class ReaderServiceImpl implements ReaderService {
         if(updateReader.getPassword() != null && !updateReader.getPassword().isBlank()) {
             reader.setPassword(updateReader.getPassword());
         }
-        reader.setRole(updateReader.getRole());
+        if(updateReader.getRole() != null && !updateReader.getRole().isBlank()) {
+            reader.setRole(updateReader.getRole());
+        }
+        if(updateReader.getIsArchived() != null) {
+            reader.setIsArchived(updateReader.getIsArchived());
+        }
+        //reader.setRole(updateReader.getRole());
         readerRepository.save(reader);
     }
 
     @Override
     public void delete(Long id) {
-        readerRepository.deleteById(id);
+        Reader reader = readerRepository.findById(id).orElseThrow();
+        reader.setIsArchived(true);
+        readerRepository.save(reader);
+        //readerRepository.deleteById(id);
     }
 
 
     public String getEmail(Long id) {
         return readerRepository.findById(id).orElseThrow().getEmail();
+    }
+
+    @Override
+    public Reader readByUsername(String username) {
+        return readerRepository.findByUsername(username).orElseThrow();
     }
 
 

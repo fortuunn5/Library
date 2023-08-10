@@ -28,24 +28,30 @@ public class Logbook {
     Book book;
 
     @Column(name="issueDate", nullable = false)
-    private Calendar issueDate = new GregorianCalendar();
+    private Calendar issueDate /*= new GregorianCalendar()*/;
 
-    @Column(name="deliveryDate", nullable = false)
-    private Calendar deliveryDate = new GregorianCalendar();
+    @Column(name="deliveryDate")
+    private Calendar deliveryDate = null;
 
     @Column(nullable = false)
-    private Boolean isArchived /*= false*/;
+    private Boolean isArchived = false;
 
     public Logbook(Reader reader, Book book, Calendar issueDate, Calendar deliveryDate, Boolean isArchived) {
+        this.id = new LogbookKey(reader.getId(), book.getId());
         this.reader = reader;
         this.book = book;
         this.issueDate = issueDate;
         this.deliveryDate = deliveryDate;
         this.isArchived = isArchived;
-
     }
 
-    @Override
+    public Logbook(Reader reader, Book book) {
+        this.id = new LogbookKey(reader.getId(), book.getId());
+        this.reader = reader;
+        this.book = book;
+    }
+
+    /*@Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
@@ -56,5 +62,18 @@ public class Logbook {
     @Override
     public int hashCode() {
         return Objects.hash(reader, book);
+    }*/
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Logbook logbook = (Logbook) o;
+        return Objects.equals(reader, logbook.reader) && Objects.equals(book, logbook.book) && Objects.equals(issueDate, logbook.issueDate) && Objects.equals(deliveryDate, logbook.deliveryDate) && Objects.equals(isArchived, logbook.isArchived);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(reader, book, issueDate, deliveryDate, isArchived);
     }
 }

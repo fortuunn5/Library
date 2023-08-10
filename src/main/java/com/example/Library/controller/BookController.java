@@ -2,7 +2,7 @@ package com.example.Library.controller;
 
 import com.example.Library.dto.BookDto;
 import com.example.Library.model.Book;
-import com.example.Library.service.BookService;
+import com.example.Library.service.interfaces.BookService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -12,12 +12,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 @RestController
-//@RequestMapping("/readers/{id}")
+@RequestMapping("/books")
 @RequiredArgsConstructor
 public class BookController {
     private final BookService bookService;
 
-    @PostMapping("/books")
+    //ha isarchived
+    @PostMapping
     public ResponseEntity<?> createBook(@RequestBody Book newBook) {
 
         List<Book> books = bookService.readAll();
@@ -30,23 +31,19 @@ public class BookController {
         }
         bookService.create(newBook);
         return new ResponseEntity<>(HttpStatus.CREATED);
-
-        /*bookService.create(newBook);
-        return new ResponseEntity<>(HttpStatus.CREATED);*/
-        //return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
-    @GetMapping("/books/{idBook}")
-    public ResponseEntity<BookDto> readBook(@PathVariable(name="idBook") Long id) {
-        if(bookService.read(id).isPresent()) {
-            Book book = bookService.read(id).orElseThrow();
+    @GetMapping("/{idBook}")
+    public ResponseEntity<BookDto> readBook(@PathVariable Long idBook) {
+        if(bookService.read(idBook).isPresent()) {
+            Book book = bookService.read(idBook).orElseThrow();
             BookDto bookDto = new BookDto(book.getId(), book.getName(), book.getAuthor(), book.getYear(), book.getIsArchived());
             return ResponseEntity.ok(bookDto);
         }
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
-    @GetMapping("/books")
+    @GetMapping
     public ResponseEntity<List<BookDto>> readBooks() {
         if(!bookService.readAll().isEmpty()) {
             List<Book> books = bookService.readAll();
@@ -59,7 +56,7 @@ public class BookController {
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
-    @PutMapping("/books/{idBook}")
+    @PutMapping("/{idBook}")
     public ResponseEntity<?> updateBook(@PathVariable(name="idBook") Long id, @RequestBody Book upBook) {
         if(id.equals(upBook.getId())) {
             if (bookService.read(id).isPresent()) {
@@ -71,7 +68,7 @@ public class BookController {
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
-    @DeleteMapping("/books/{idBook}")
+    @DeleteMapping("/{idBook}")
     public ResponseEntity<?> deleteBook(@PathVariable(name="idBook") Long id) {
         if(bookService.read(id).isPresent()) {
             bookService.delete(id);

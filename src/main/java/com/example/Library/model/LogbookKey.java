@@ -21,22 +21,6 @@ public class LogbookKey implements Serializable {
     @Column(name="book_id")
     Long bookId;
 
-    /*@Override
-    public int hashCode() {
-        long hash = readerId + bookId;
-        return (int) hash;
-    }
-    @Override
-    public boolean equals(Object obj) {
-        if(this == obj) {
-            return true;
-        }
-        if(obj.getClass()!=this.getClass()) {
-            return false;
-        }
-        return (Objects.equals(readerId, ((LogbookKey) obj).getReaderId()) && Objects.equals(bookId, ((LogbookKey) obj).bookId));
-    }*/
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

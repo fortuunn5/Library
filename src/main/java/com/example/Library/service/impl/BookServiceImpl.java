@@ -1,10 +1,9 @@
-package com.example.Library.service;
+package com.example.Library.service.impl;
 
-import com.example.Library.dto.BookDto;
 import com.example.Library.model.Book;
 import com.example.Library.repository.BookRepository;
+import com.example.Library.service.interfaces.BookService;
 import lombok.RequiredArgsConstructor;
-import org.apache.poi.sl.draw.geom.GuideIf;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -12,7 +11,7 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
-public class BookServiceImpl implements BookService{
+public class BookServiceImpl implements BookService {
     private final BookRepository bookRepository;
 
     @Override
@@ -20,11 +19,12 @@ public class BookServiceImpl implements BookService{
         List<Book> books = bookRepository.findAll();
         boolean isExist=false;
         for(int i=0; i<books.size(); i++) {
-            if(books.get(i).getName().equals(newBook.getName())
-                    && books.get(i).getAuthor().equals(newBook.getAuthor())
-                    && books.get(i).getYear().equals(newBook.getYear())) {
+
+            isExist = books.stream().anyMatch(x -> x.equals(newBook));
+
+            /*if(books.get(i).equals(newBook)) {
                 isExist=true;
-            }
+            }*/
         }
         if (!isExist) {
             bookRepository.save(newBook);
@@ -54,13 +54,17 @@ public class BookServiceImpl implements BookService{
         if(updateBook.getYear()!=null) {
             book.setYear(updateBook.getYear());
         }
+        if(updateBook.getIsArchived()!=null) {
+            book.setIsArchived((updateBook.getIsArchived()));
+        }
         bookRepository.save(book);
-
     }
 
     @Override
     public void delete(Long id) {
-        bookRepository.deleteById(id);
+        Book book = bookRepository.findById(id).orElseThrow();
+        book.setIsArchived(true);
+        bookRepository.save(book);
     }
 
 }

@@ -1,4 +1,4 @@
-package com.example.Library.service;
+package com.example.Library.service.interfaces;
 
 import com.example.Library.dto.ReaderDto;
 import com.example.Library.model.Reader;
@@ -14,4 +14,6 @@ public interface ReaderService {
     List<Reader> readAll();
     void update(Reader updateReader);
     void delete(Long id);
+
+    Reader readByUsername(String username);
 }

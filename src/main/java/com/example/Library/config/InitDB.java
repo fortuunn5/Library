@@ -3,12 +3,13 @@ package com.example.Library.config;
 import com.example.Library.model.Book;
 import com.example.Library.model.Logbook;
 import com.example.Library.model.Reader;
-import com.example.Library.service.BookService;
-import com.example.Library.service.LogbookService;
-import com.example.Library.service.ReaderService;
+import com.example.Library.service.interfaces.BookService;
+import com.example.Library.service.interfaces.LogbookService;
+import com.example.Library.service.interfaces.ReaderService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Calendar;
 import java.util.GregorianCalendar;
@@ -20,6 +21,7 @@ public class InitDB {
     private final ReaderService readerService;
     private final BookService bookService;
     private final LogbookService logbookService;
+    private final PasswordEncoder passwordEncoder;
     @Bean
     public void createReader() {
         Reader reader;
@@ -29,18 +31,19 @@ public class InitDB {
                 "Петров Петр Петрович",
                 "aaaaa@a.com",
                 "aaaa",
-                "aaaa"));
+                passwordEncoder.encode("aaaa"),
+                "ROLE_ADMIN"));
         readerService.create(new Reader(
                 "Макарова Виктория Александровна",
                 "bbbbb@b.com",
                 "bbbb",
-                "bbbb"
+                passwordEncoder.encode("bbbb")
         ));
         readerService.create(new Reader(
                 "Александров Леонид Эмирович",
                 "ccccc@c.com",
                 "cccc",
-                "cccc"
+                passwordEncoder.encode("cccc")
         ));
 
         bookService.create(new Book(
@@ -73,16 +76,38 @@ public class InitDB {
         Book book2 = bookService.read(3L).orElseThrow();
         Book book3 = bookService.read(4L).orElseThrow();
 
-        logbookService.create(new Logbook(reader, book, new GregorianCalendar(2022, Calendar.MAY, 9),
-                new GregorianCalendar(2022, Calendar.MAY, 23), true));
 
-        logbookService.create(new Logbook(reader1, book1, new GregorianCalendar(2019, Calendar.AUGUST, 4),
-                                                          new GregorianCalendar(2019, Calendar.SEPTEMBER, 8), true));
+        Logbook logbook1 = new Logbook(reader, book, new GregorianCalendar(2022, Calendar.MAY, 9),
+                new GregorianCalendar(2022, Calendar.MAY, 23), true);
+        logbookService.create(logbook1);
+        Logbook logbook2 = new Logbook(reader, book, new GregorianCalendar(2022, Calendar.MAY, 9),
+                new GregorianCalendar(2022, Calendar.MAY, 23), true);
+        logbookService.update(logbook2);
+
+
+        /*logbookService.create(new Logbook(reader, book, new GregorianCalendar(2022, Calendar.MAY, 9),
+                new GregorianCalendar(2022, Calendar.MAY, 23), false));*/
+
+        Logbook logbookk = new Logbook(reader1, book1, new GregorianCalendar(2019, Calendar.AUGUST, 4),
+                new GregorianCalendar(2019, Calendar.SEPTEMBER, 8), true);
+        logbookService.create(logbookk);
+        Logbook g = new Logbook(reader1, book1, new GregorianCalendar(2019, Calendar.AUGUST, 4),
+                new GregorianCalendar(2019, Calendar.SEPTEMBER, 8), true);
+        logbookService.update(g);
+
+        /*logbookService.create(new Logbook(reader1, book1, new GregorianCalendar(2019, Calendar.AUGUST, 4),
+                                                          new GregorianCalendar(2019, Calendar.SEPTEMBER, 8), true));*/
 
         logbookService.create(new Logbook(reader2, book2, new GregorianCalendar(2007, Calendar.APRIL, 9),
                                                           new GregorianCalendar(2007, Calendar.MAY, 13), true));
 
         logbookService.create(new Logbook(reader2, book3, new GregorianCalendar(2021, Calendar.DECEMBER, 21),
                                                           new GregorianCalendar(2022, Calendar.JANUARY, 30), true));
+
+
+
+        Logbook lll = new Logbook(reader2, book2);
+        logbookService.create(lll);
+
     }
 }
