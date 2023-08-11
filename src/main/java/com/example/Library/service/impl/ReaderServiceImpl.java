@@ -16,11 +16,9 @@ public class ReaderServiceImpl implements ReaderService {
 
     @Override
     public void create(Reader newReader) {
-
         if(readerRepository.findByEmail(newReader.getEmail()).isEmpty()) {
             readerRepository.save(newReader);
         }
-
     }
 
     @Override
@@ -56,7 +54,6 @@ public class ReaderServiceImpl implements ReaderService {
         if(updateReader.getIsArchived() != null) {
             reader.setIsArchived(updateReader.getIsArchived());
         }
-        //reader.setRole(updateReader.getRole());
         readerRepository.save(reader);
     }
 
@@ -65,7 +62,6 @@ public class ReaderServiceImpl implements ReaderService {
         Reader reader = readerRepository.findById(id).orElseThrow();
         reader.setIsArchived(true);
         readerRepository.save(reader);
-        //readerRepository.deleteById(id);
     }
 
 

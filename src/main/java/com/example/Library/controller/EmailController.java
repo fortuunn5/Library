@@ -36,19 +36,18 @@ public class EmailController {
         String subject = "Просрочка";
         String message = "";
 
-        for(int i=0; i<logbooks.size(); i++) {
-            long dif = 0;
-            if(logbooks.get(i).getDeliveryDate()!=null) {
-                dif = logbookService.getOverdueDays(logbooks.get(i).getIssueDate(), logbooks.get(i).getDeliveryDate());
+        for (Logbook logbook : logbooks) {
+            long dif;
+            if (logbook.getDeliveryDate() != null) {
+                dif = logbookService.getOverdueDays(logbook.getIssueDate(), logbook.getDeliveryDate());
+            } else {
+                dif = logbookService.getOverdueDays(logbook.getIssueDate(), Calendar.getInstance());
             }
-            else {
-                dif = logbookService.getOverdueDays(logbooks.get(i).getIssueDate(), Calendar.getInstance());
-            }
-            if(dif!=0) {
+            if (dif != 0) {
                 float penalties = logbookService.getPenalties(dif);
                 message = "Вы просрочили сдачу книги на " + dif + " дней. Задолженность составляет " + penalties + " рублей.";
             }
-            sendEmail(logbooks.get(i).getReader().getEmail(), subject, message);
+            sendEmail(logbook.getReader().getEmail(), subject, message);
         }
         return new ResponseEntity<>(HttpStatus.OK);
     }

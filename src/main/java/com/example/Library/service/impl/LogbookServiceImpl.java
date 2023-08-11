@@ -1,10 +1,14 @@
 package com.example.Library.service.impl;
 
+import com.example.Library.model.Book;
 import com.example.Library.model.Logbook;
 import com.example.Library.model.LogbookKey;
 import com.example.Library.model.Reader;
+import com.example.Library.repository.BookRepository;
 import com.example.Library.repository.LogbookRepository;
+import com.example.Library.repository.ReaderRepository;
 import com.example.Library.service.interfaces.LogbookService;
+import com.example.Library.service.interfaces.ReaderService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -15,26 +19,17 @@ import java.util.concurrent.TimeUnit;
 @RequiredArgsConstructor
 public class LogbookServiceImpl implements LogbookService {
     private final LogbookRepository logbookRepository;
-    @Override
+    private final BookRepository bookRepository;
+    private final ReaderRepository readerRepository;
+    /*@Override
     public void create(Logbook newLogbook) {
-        /*newLogbook.setIsArchived(false);
-        newLogbook.setIssueDate(Calendar.getInstance());
-        logbookRepository.save(newLogbook);*/
 
-        //TODO: инвертировать, слишком тяжело читать
         if(newLogbook.getReader().getIsArchived() || newLogbook.getBook().getIsArchived()) {
             return;
         }
         List<Logbook> logbooks = logbookRepository.findAll();
         boolean isExist = false;
-        for (int i = 0; i < logbooks.size(); i++) { //TODO: equals
-            /*if (logbooks.get(i).getReader().equals(newLogbook.getReader()) &&
-                    logbooks.get(i).getBook().equals(newLogbook.getBook()) &&
-                    logbooks.get(i).getIsArchived().equals(newLogbook.getIsArchived()) &&
-                    logbooks.get(i).getIssueDate().equals(newLogbook.getIssueDate()) &&
-                    logbooks.get(i).getDeliveryDate().equals(newLogbook.getDeliveryDate())) {
-                    isExist = true;
-            }*/
+        for (int i = 0; i < logbooks.size(); i++) {
             if(logbooks.get(i).equals(newLogbook))
                 isExist = true;
         }
@@ -42,6 +37,27 @@ public class LogbookServiceImpl implements LogbookService {
             newLogbook.setIsArchived(false);
             newLogbook.setIssueDate(Calendar.getInstance());
             newLogbook.setDeliveryDate(null);
+            logbookRepository.save(newLogbook);
+        }
+    }*/
+
+    @Override
+    public void create(Logbook newLogbook) {
+
+        Reader reader = newLogbook.getReader();
+        Book book = newLogbook.getBook();
+
+        if(reader.getIsArchived() || book.getIsArchived()) {
+            return;
+        }
+        List<Logbook> logbooks = logbookRepository.findAll();
+        boolean isExist = false;
+        for(int i=0; i<logbooks.size(); i++) {
+            if(logbooks.get(i).equals(newLogbook)) {
+                isExist = true;
+            }
+        }
+        if(!isExist) {
             logbookRepository.save(newLogbook);
         }
     }
@@ -74,12 +90,6 @@ public class LogbookServiceImpl implements LogbookService {
         if(updateLogbook.getIssueDate() != null)  {
             logbook.setIssueDate(updateLogbook.getIssueDate());
         }
-        /*if(updateLogbook.getDeliveryDate() != null) {
-            logbook.setDeliveryDate(updateLogbook.getDeliveryDate());
-        }
-        if(updateLogbook.getIsArchived()!=null) {
-            logbook.setIsArchived(updateLogbook.getIsArchived());
-        }*/
         if(updateLogbook.getDeliveryDate()!=null) {
             logbook.setDeliveryDate(updateLogbook.getDeliveryDate());
             logbook.setIsArchived(true);
@@ -116,7 +126,7 @@ public class LogbookServiceImpl implements LogbookService {
 
     @Override
     public float getPenalties(Long overDays) {
-        float pen=0;
+        float pen;
         if(overDays>14) {
             pen = (float) (14*0.03+(overDays-14)*0.06);
         }

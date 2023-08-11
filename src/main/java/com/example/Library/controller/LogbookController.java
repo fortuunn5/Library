@@ -3,9 +3,11 @@ package com.example.Library.controller;
 import com.example.Library.dto.BookDto;
 import com.example.Library.dto.LogbookDto;
 import com.example.Library.dto.ReaderDto;
+import com.example.Library.model.Book;
 import com.example.Library.model.Logbook;
 import com.example.Library.model.LogbookKey;
 import com.example.Library.model.Reader;
+import com.example.Library.service.interfaces.BookService;
 import com.example.Library.service.interfaces.LogbookService;
 import com.example.Library.service.interfaces.ReaderService;
 import lombok.RequiredArgsConstructor;
@@ -24,111 +26,130 @@ import java.util.List;
 public class LogbookController {
     private final LogbookService logbookService;
     private final ReaderService readerService;
-    //private final BookService bookService;
+    private final BookService bookService;
 
     @PostMapping
-    public ResponseEntity<?> createLogbook(@RequestBody Logbook newLogbook) {
-        List<Logbook> logbooks = logbookService.readAll();
-        for(int i=0; i<logbooks.size(); i++) {
-            if(logbooks.get(i).getReader().equals(newLogbook.getReader())
-                    && logbooks.get(i).getBook().equals(newLogbook.getBook())
-                    && logbooks.get(i).getIsArchived().equals(newLogbook.getIsArchived())
-                    && logbooks.get(i).getIssueDate().equals(newLogbook.getIssueDate())
-                    && logbooks.get(i).getDeliveryDate().equals(newLogbook.getDeliveryDate())) {
-                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-            }
-        }
-        if(!newLogbook.getReader().getIsArchived() || !newLogbook.getBook().getIsArchived())
+    public ResponseEntity<?> createLogbook(@RequestBody LogbookKey newLogbookKey) {
+        Reader reader = readerService.read(newLogbookKey.getReaderId()).orElseThrow();
+        Book book = bookService.read(newLogbookKey.getBookId()).orElseThrow();
+
+        if (reader.getIsArchived() || book.getIsArchived()) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        logbookService.create(newLogbook);
+        }
+
+        Logbook logbook = Logbook.builder()
+                .id(newLogbookKey)
+                .reader(reader)
+                .book(book)
+                .build();
+        logbookService.create(logbook);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
     @GetMapping
     public ResponseEntity<LogbookDto> readLogbook(@RequestBody LogbookKey id) {
-        if(logbookService.read(id).isPresent()) {
+        if (logbookService.read(id).isPresent()) {
             Logbook logbook = logbookService.read(id).orElseThrow();
-            ReaderDto readerDto = new ReaderDto(logbook.getReader().getId(),
-                    logbook.getReader().getFio(),
-                    logbook.getReader().getEmail(),
-                    logbook.getReader().getUsername(),
-                    logbook.getReader().getIsArchived());
-            BookDto bookDto = new BookDto(logbook.getBook().getId(),
-                    logbook.getBook().getName(),
-                    logbook.getBook().getAuthor(),
-                    logbook.getBook().getYear(),
-                    logbook.getBook().getIsArchived());
-            return ResponseEntity.ok(new LogbookDto(logbook.getId(), readerDto, bookDto, logbook.getIssueDate(), logbook.getDeliveryDate(), logbook.getIsArchived()));
+            ReaderDto readerDto = ReaderDto.builder()
+                    .id(logbook.getReader().getId())
+                    .fio(logbook.getReader().getFio())
+                    .email(logbook.getReader().getEmail())
+                    .username(logbook.getReader().getUsername())
+                    .isArchived(logbook.getReader().getIsArchived())
+                    .build();
+            BookDto bookDto = BookDto.builder()
+                    .id(logbook.getBook().getId())
+                    .name(logbook.getBook().getName())
+                    .year(logbook.getBook().getYear())
+                    .isArchived(logbook.getBook().getIsArchived())
+                    .build();
+            LogbookDto logbookDto = LogbookDto.builder()
+                    .id(logbook.getId())
+                    .reader(readerDto)
+                    .book(bookDto)
+                    .issueDate(logbook.getIssueDate())
+                    .deliveryDate(logbook.getDeliveryDate())
+                    .isArchived(logbook.getIsArchived())
+                    .build();
+            return ResponseEntity.ok(logbookDto);
         }
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
     @GetMapping("/all")
     public ResponseEntity<List<LogbookDto>> readLogbooks() {
-        if(!logbookService.readAll().isEmpty()) {
+        if (!logbookService.readAll().isEmpty()) {
             List<Logbook> logbooks = logbookService.readAll();
-            List<LogbookDto> logbookDtos = new ArrayList<>();
-            //ReaderDto readerDto = new ReaderDto();
-            //BookDto bookDto = new BookDto();
+            List<LogbookDto> logbookDtoList = new ArrayList<>();
 
-            for(int i=0; i<logbooks.size(); i++) {
-                ReaderDto readerDto = new ReaderDto(logbooks.get(i).getReader().getId(),
-                        logbooks.get(i).getReader().getFio(),
-                        logbooks.get(i).getReader().getEmail(),
-                        logbooks.get(i).getReader().getUsername(),
-                        logbooks.get(i).getReader().getIsArchived());
-                //readerDto.setFio(logbooks.get(i).getReader().getFio());
-                //readerDto.setEmail(logbooks.get(i).getReader().getEmail());
-                //readerDto.setUsername(logbooks.get(i).getReader().getUsername());
-                //readerDto.setIsArchived(logbooks.get(i).getReader().getIsArchived());
+            for (Logbook logbook : logbooks) {
+                ReaderDto readerDto = ReaderDto.builder()
+                        .id(logbook.getReader().getId())
+                        .fio(logbook.getReader().getFio())
+                        .email(logbook.getReader().getEmail())
+                        .username(logbook.getReader().getUsername())
+                        .isArchived(logbook.getReader().getIsArchived())
+                        .build();
 
-                BookDto bookDto = new BookDto(logbooks.get(i).getBook().getId(),
-                        logbooks.get(i).getBook().getName(),
-                        logbooks.get(i).getBook().getAuthor(),
-                        logbooks.get(i).getBook().getYear(),
-                        logbooks.get(i).getBook().getIsArchived());
+                BookDto bookDto = BookDto.builder()
+                        .id(logbook.getBook().getId())
+                        .name(logbook.getBook().getName())
+                        .author(logbook.getBook().getAuthor())
+                        .year(logbook.getBook().getYear())
+                        .isArchived(logbook.getBook().getIsArchived())
+                        .build();
 
-                //bookDto.setName(logbooks.get(i).getBook().getName());
-                //bookDto.setAuthor(logbooks.get(i).getBook().getAuthor());
-                //bookDto.setYear(logbooks.get(i).getBook().getYear());
-                //bookDto.setIsArchived(logbooks.get(i).getBook().getIsArchived());
-
-                logbookDtos.add(new LogbookDto(logbooks.get(i).getId(),
-                        readerDto,
-                        bookDto,
-                        logbooks.get(i).getIssueDate(),
-                        logbooks.get(i).getDeliveryDate(),
-                        logbooks.get(i).getIsArchived()));
+                logbookDtoList.add(LogbookDto.builder()
+                        .id(logbook.getId())
+                        .reader(readerDto)
+                        .book(bookDto)
+                        .issueDate(logbook.getIssueDate())
+                        .deliveryDate(logbook.getDeliveryDate())
+                        .isArchived(logbook.getIsArchived())
+                        .build()
+                );
             }
-            return ResponseEntity.ok(logbookDtos);
-            //bookService.readAll();
-            //return ResponseEntity.ok(logbookService.readAll());
+            return ResponseEntity.ok(logbookDtoList);
         }
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
     @GetMapping("/user")
-    public ResponseEntity<List<LogbookDto>> readReadersLogbooks(/*@PathVariable(name="id") Long id*/) {
-        //if(readerService.read(id).isPresent()) {
-            UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-            Reader reader = readerService.readByUsername(userDetails.getUsername());
-            //Reader reader = readerService.read(id).orElseThrow();
-            ReaderDto readerDto = new ReaderDto(reader.getId(), reader.getFio(), reader.getEmail(), reader.getUsername(), reader.getIsArchived());
-            List<Logbook> logbooks = logbookService.readReadersLogbooks(reader);
-            List<LogbookDto> logbookDtoList = new ArrayList<>();
+    public ResponseEntity<List<LogbookDto>> readReadersLogbooks() {
+        UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Reader reader = readerService.readByUsername(userDetails.getUsername());
 
-            for(int i=0; i<logbooks.size(); i++) {
-                BookDto bookDto = new BookDto(logbooks.get(i).getBook().getId(), logbooks.get(i).getBook().getName(),
-                        logbooks.get(i).getBook().getAuthor(), logbooks.get(i).getBook().getYear(), logbooks.get(i).getBook().getIsArchived());
-                logbookDtoList.add(new LogbookDto(logbooks.get(i).getId(),
-                        readerDto, bookDto,
-                        logbooks.get(i).getIssueDate(),
-                        logbooks.get(i).getDeliveryDate(),
-                        logbooks.get(i).getIsArchived()));
-            }
-            return ResponseEntity.ok(logbookDtoList);
-        //}
-        //return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        ReaderDto readerDto = ReaderDto.builder()
+                .id(reader.getId())
+                .fio(reader.getFio())
+                .email(reader.getEmail())
+                .username(reader.getUsername())
+                .isArchived(reader.getIsArchived())
+                .build();
+
+        List<Logbook> logbooks = logbookService.readReadersLogbooks(reader);
+        List<LogbookDto> logbookDtoList = new ArrayList<>();
+
+        for (Logbook logbook : logbooks) {
+
+            BookDto bookDto = BookDto.builder()
+                    .id(logbook.getBook().getId())
+                    .name(logbook.getBook().getName())
+                    .author(logbook.getBook().getAuthor())
+                    .year(logbook.getBook().getYear())
+                    .isArchived(logbook.getBook().getIsArchived())
+                    .build();
+
+            logbookDtoList.add(LogbookDto.builder()
+                    .id(logbook.getId())
+                    .reader(readerDto)
+                    .book(bookDto)
+                    .issueDate(logbook.getIssueDate())
+                    .deliveryDate(logbook.getDeliveryDate())
+                    .isArchived(logbook.getIsArchived())
+                    .build());
+        }
+        return ResponseEntity.ok(logbookDtoList);
     }
 
     @PutMapping
@@ -142,7 +163,7 @@ public class LogbookController {
 
     @DeleteMapping
     public ResponseEntity<?> deleteLogbook(@RequestBody LogbookKey id) {
-        if(logbookService.read(id).isPresent()) {
+        if (logbookService.read(id).isPresent()) {
             logbookService.delete(id);
             return new ResponseEntity<>(HttpStatus.OK);
         }

@@ -19,12 +19,7 @@ public class BookServiceImpl implements BookService {
         List<Book> books = bookRepository.findAll();
         boolean isExist=false;
         for(int i=0; i<books.size(); i++) {
-
             isExist = books.stream().anyMatch(x -> x.equals(newBook));
-
-            /*if(books.get(i).equals(newBook)) {
-                isExist=true;
-            }*/
         }
         if (!isExist) {
             bookRepository.save(newBook);

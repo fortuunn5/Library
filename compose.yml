@@ -1,9 +1,37 @@
+#services:
+#  db_pq_15:
+#    image: postgres:15
+#    environment:
+#      POSTGRES_DB: sandbox
+#      POSTGRES_USER: sandbox_user
+#      POSTGRES_PASSWORD: sandbox_password
+#    ports:
+#      - 5432
+
+version: '3.8'
+
 services:
-  db_pq_15:
-    image: postgres:15
+  postgres:
+    image: postgres:15-alpine
     environment:
-      POSTGRES_DB: sandbox
-      POSTGRES_USER: sandbox_user
-      POSTGRES_PASSWORD: sandbox_password
+      POSTGRES_USER: dockeruser
+      POSTGRES_PASSWORD: dockerpassword
+      POSTGRES_DB: dockerdb
     ports:
-      - 5432
+      - "5555:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+
+  app:
+    build: .
+    ports:
+      - "8080:8080"
+    depends_on:
+      - postgres
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/dockerdb
+      SPRING_DATASOURCE_USERNAME: dockeruser
+      SPRING_DATASOURCE_PASSWORD: dockerpassword
+
+volumes:
+  postgres-data:

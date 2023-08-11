@@ -33,8 +33,8 @@ public class ExcelService {
         Workbook workbook = new XSSFWorkbook();
         Sheet shUnload = workbook.createSheet("Отчет за " + calendarDto.getMonth() + "." + calendarDto.getYear() + "г.");
 
-        createHeader(workbook, shUnload);
-        createCells(workbook, shUnload, calendarDto);
+        createHeader(shUnload);
+        createCells(shUnload, calendarDto);
 
         shUnload.autoSizeColumn(8);
 
@@ -45,7 +45,7 @@ public class ExcelService {
         workbook.close();
     }
 
-    public void createHeader(Workbook workbook, Sheet sheet) {
+    public void createHeader(Sheet sheet) {
         Row header = sheet.createRow(0);
 
         Cell headerCell = header.createCell(0);
@@ -67,7 +67,7 @@ public class ExcelService {
         headerCell.setCellValue("Количество просроченных дней");
     }
 
-    public void createCells(Workbook workbook, Sheet sheet, CalendarDto calendarDto) {
+    public void createCells(Sheet sheet, CalendarDto calendarDto) {
         List<Reader> readers = readerRepository.findAll();
         Cell cell;
         Row row;
@@ -78,23 +78,14 @@ public class ExcelService {
         for(int i=0; i<readers.size(); i++) {
             List<Logbook> logbooks = periodLogbooks(readers.get(i),calendarDto);
             if(!logbooks.isEmpty()) {
-                //row= sheet.createRow(countRow);
-
-                //cell = row.createCell(0);
-                //cell.setCellValue(readers.get(i).getFio());
-
-                //cell = row.createCell(1);
-                //cell.setCellValue(readers.get(i).getEmail());
 
                 for (int j = 0; j < logbooks.size(); j++) {
                     row = sheet.createRow(countRow);
-                    ////////////////////////////////////////////
                     cell = row.createCell(0);
                     cell.setCellValue(readers.get(i).getFio());
 
                     cell = row.createCell(1);
                     cell.setCellValue(readers.get(i).getEmail());
-                    /////////////////////////////////////////////
 
                     cell = row.createCell(2);
                     cell.setCellValue(logbooks.get(j).getBook().getName());
@@ -130,12 +121,12 @@ public class ExcelService {
     public List<Logbook> periodLogbooks(Reader reader, CalendarDto calendarDto) {
         List<Logbook> logbooks = new ArrayList<>(reader.getLogbooks());
         List<Logbook> curLogbooks = new ArrayList<>();
-        for(int i=0; i<logbooks.size(); i++) {
-            Calendar c = logbooks.get(i).getIssueDate();
-            int month = c.get(Calendar.MONTH)+1;
+        for (Logbook logbook : logbooks) {
+            Calendar c = logbook.getIssueDate();
+            int month = c.get(Calendar.MONTH) + 1;
             int year = c.get(Calendar.YEAR);
-            if(calendarDto.getYear()==year && calendarDto.getMonth()==month) {
-                curLogbooks.add(logbooks.get(i));
+            if (calendarDto.getYear() == year && calendarDto.getMonth() == month) {
+                curLogbooks.add(logbook);
             }
         }
         return curLogbooks;

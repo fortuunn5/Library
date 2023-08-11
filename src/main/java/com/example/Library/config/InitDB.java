@@ -20,94 +20,66 @@ public class InitDB {
 
     private final ReaderService readerService;
     private final BookService bookService;
-    private final LogbookService logbookService;
     private final PasswordEncoder passwordEncoder;
     @Bean
     public void createReader() {
-        Reader reader;
+        Reader reader0;
         Reader reader1;
         Reader reader2;
-        readerService.create(new Reader(
-                "Петров Петр Петрович",
-                "aaaaa@a.com",
-                "aaaa",
-                passwordEncoder.encode("aaaa"),
-                "ROLE_ADMIN"));
-        readerService.create(new Reader(
-                "Макарова Виктория Александровна",
-                "bbbbb@b.com",
-                "bbbb",
-                passwordEncoder.encode("bbbb")
-        ));
-        readerService.create(new Reader(
-                "Александров Леонид Эмирович",
-                "ccccc@c.com",
-                "cccc",
-                passwordEncoder.encode("cccc")
-        ));
 
+        readerService.create(Reader.builder()
+                .fio("Петров Петр Петрович")
+                .email("aaaaa@a.com")
+                .username("aaaa")
+                .password(passwordEncoder.encode("aaaa"))
+                .role("ROLE_ADMIN")
+                .build()
+        );
+        readerService.create(Reader.builder()
+                .fio("Макарова Анастасия Александровна")
+                .email("bbbbb@b.com")
+                .username("bbbb")
+                .password(passwordEncoder.encode("bbbb"))
+                .build()
+        );
+        readerService.create(Reader.builder()
+                .fio("Александров Леонид Эмирович")
+                .email("ccccc@c.com")
+                .username("cccc")
+                .password(passwordEncoder.encode("cccc"))
+                .build()
+        );
         bookService.create(new Book(
                 "Война и мир",
                 "Лев Толстой",
                 1873
         ));
         bookService.create(new Book(
-                "1984",
-                "Джордж Оруэлл",
-                1949
+                "Евгений Онегин",
+                "Александр Пушкин",
+                1823
         ));
         bookService.create(new Book(
                 "Лолита",
                 "Владимир Набоков",
-                1998
+                1955
         ));
         bookService.create(new Book(
-                "Левиафан",
-                "Томас Гоббс",
-                1998
+                "Мастер и Маргарита",
+                "Михаил Булгаков",
+                1929
         ));
 
-        reader=readerService.read(1L).orElseThrow();
+        reader0=readerService.read(1L).orElseThrow();
         reader1=readerService.read(2L).orElseThrow();
         reader2=readerService.read(3L).orElseThrow();
+
+
 
         Book book = bookService.read(1L).orElseThrow();
         Book book1 = bookService.read(2L).orElseThrow();
         Book book2 = bookService.read(3L).orElseThrow();
         Book book3 = bookService.read(4L).orElseThrow();
-
-
-        Logbook logbook1 = new Logbook(reader, book, new GregorianCalendar(2022, Calendar.MAY, 9),
-                new GregorianCalendar(2022, Calendar.MAY, 23), true);
-        logbookService.create(logbook1);
-        Logbook logbook2 = new Logbook(reader, book, new GregorianCalendar(2022, Calendar.MAY, 9),
-                new GregorianCalendar(2022, Calendar.MAY, 23), true);
-        logbookService.update(logbook2);
-
-
-        /*logbookService.create(new Logbook(reader, book, new GregorianCalendar(2022, Calendar.MAY, 9),
-                new GregorianCalendar(2022, Calendar.MAY, 23), false));*/
-
-        Logbook logbookk = new Logbook(reader1, book1, new GregorianCalendar(2019, Calendar.AUGUST, 4),
-                new GregorianCalendar(2019, Calendar.SEPTEMBER, 8), true);
-        logbookService.create(logbookk);
-        Logbook g = new Logbook(reader1, book1, new GregorianCalendar(2019, Calendar.AUGUST, 4),
-                new GregorianCalendar(2019, Calendar.SEPTEMBER, 8), true);
-        logbookService.update(g);
-
-        /*logbookService.create(new Logbook(reader1, book1, new GregorianCalendar(2019, Calendar.AUGUST, 4),
-                                                          new GregorianCalendar(2019, Calendar.SEPTEMBER, 8), true));*/
-
-        logbookService.create(new Logbook(reader2, book2, new GregorianCalendar(2007, Calendar.APRIL, 9),
-                                                          new GregorianCalendar(2007, Calendar.MAY, 13), true));
-
-        logbookService.create(new Logbook(reader2, book3, new GregorianCalendar(2021, Calendar.DECEMBER, 21),
-                                                          new GregorianCalendar(2022, Calendar.JANUARY, 30), true));
-
-
-
-        Logbook lll = new Logbook(reader2, book2);
-        logbookService.create(lll);
 
     }
 }

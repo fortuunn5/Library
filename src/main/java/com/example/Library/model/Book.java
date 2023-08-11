@@ -7,11 +7,12 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
+
 @Entity
 @Getter
 @Setter
-@NoArgsConstructor
 @AllArgsConstructor
+@NoArgsConstructor
 public class Book {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)

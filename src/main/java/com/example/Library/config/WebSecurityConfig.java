@@ -27,16 +27,6 @@ public class WebSecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         return http
-                /*.csrf(AbstractHttpConfigurer::disable)
-                .sessionManagement(s->s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .httpBasic(Customizer.withDefaults())
-                .authorizeHttpRequests(authorizeHttpRequests -> authorizeHttpRequests.anyRequest().permitAll())
-                .build();*/
-                /*.httpBasic(Customizer.withDefaults())
-                .authorizeRequests()
-                .requestMatchers("/", "/register").permitAll()
-                .requestMatchers("/**").hasRole("ADMIN")
-                .and().build();*/
                 .httpBasic(Customizer.withDefaults())
                 .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(s->s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

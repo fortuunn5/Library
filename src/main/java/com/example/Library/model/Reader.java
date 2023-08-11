@@ -14,7 +14,7 @@ import java.util.*;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-//@RequiredArgsConstructor
+@Builder
 public class Reader implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -35,9 +35,11 @@ public class Reader implements UserDetails {
     private String password;
 
     @Column(nullable = false)
+    @Builder.Default
     private String role = "ROLE_USER";
 
     @Column(nullable = false)
+    @Builder.Default
     private Boolean isArchived = false;
 
     @OneToMany(mappedBy="reader")

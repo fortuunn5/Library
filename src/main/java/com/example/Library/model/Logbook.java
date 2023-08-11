@@ -10,12 +10,13 @@ import java.util.Objects;
 @Entity
 @Getter
 @Setter
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-//@RequiredArgsConstructor
 public class Logbook {
     @EmbeddedId
-    private LogbookKey id= new LogbookKey();
+    @Builder.Default
+    private LogbookKey id = new LogbookKey();
 
     @ManyToOne
     @MapsId("readerId")
@@ -28,12 +29,15 @@ public class Logbook {
     Book book;
 
     @Column(name="issueDate", nullable = false)
-    private Calendar issueDate /*= new GregorianCalendar()*/;
+    @Builder.Default
+    private Calendar issueDate=Calendar.getInstance();
 
     @Column(name="deliveryDate")
+    @Builder.Default
     private Calendar deliveryDate = null;
 
     @Column(nullable = false)
+    @Builder.Default
     private Boolean isArchived = false;
 
     public Logbook(Reader reader, Book book, Calendar issueDate, Calendar deliveryDate, Boolean isArchived) {
@@ -45,24 +49,15 @@ public class Logbook {
         this.isArchived = isArchived;
     }
 
+    public Logbook(LogbookKey id) {
+        this.id = id;
+    }
+
     public Logbook(Reader reader, Book book) {
         this.id = new LogbookKey(reader.getId(), book.getId());
         this.reader = reader;
         this.book = book;
     }
-
-    /*@Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Logbook logbook = (Logbook) o;
-        return Objects.equals(reader, logbook.reader) && Objects.equals(book, logbook.book);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(reader, book);
-    }*/
 
     @Override
     public boolean equals(Object o) {

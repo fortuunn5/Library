@@ -2,16 +2,14 @@ package com.example.Library.dto;
 
 import com.example.Library.model.LogbookKey;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.Calendar;
 import java.util.Objects;
 
 @Getter
 @Setter
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor
 public class LogbookDto {

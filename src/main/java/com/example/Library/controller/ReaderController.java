@@ -20,8 +20,8 @@ public class ReaderController {
     @PostMapping
     public ResponseEntity<?> createReader(@RequestBody Reader newReader) {
         List<Reader> readers = readerService.readAll();
-        for(int i=0; i<readers.size(); i++) {
-            if(readers.get(i).equals(newReader))
+        for (Reader reader : readers) {
+            if (reader.equals(newReader))
                 return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
         readerService.create(newReader);
@@ -32,7 +32,13 @@ public class ReaderController {
     public ResponseEntity<ReaderDto> readReader(@PathVariable(name="id") Long id) {
         if(readerService.read(id).isPresent()) {
             Reader reader = readerService.read(id).orElseThrow();
-            ReaderDto readerDto = new ReaderDto(reader.getId(), reader.getFio(), reader.getEmail(), reader.getUsername(), reader.getIsArchived());
+            ReaderDto readerDto = ReaderDto.builder()
+                    .id(reader.getId())
+                    .fio(reader.getFio())
+                    .email(reader.getEmail())
+                    .username(reader.getUsername())
+                    .isArchived(reader.getIsArchived())
+                    .build();
             return ResponseEntity.ok(readerDto);
         }
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -42,30 +48,29 @@ public class ReaderController {
     public ResponseEntity<List<ReaderDto>> readReaders() {
         if(!readerService.readAll().isEmpty()) {
             List<Reader> readers = readerService.readAll();
-            List<ReaderDto> readerDtos = new ArrayList<>();
-            for(int i=0; i<readers.size(); i++) {
-                Long curId = readers.get(i).getId();
-                String curFio = readers.get(i).getFio();
-                String curEmail = readers.get(i).getEmail();
-                String curUsername = readers.get(i).getUsername();
-                Boolean curIsArchived = readers.get(i).getIsArchived();
-                readerDtos.add(new ReaderDto(curId, curFio, curEmail, curUsername, curIsArchived));
+            List<ReaderDto> readerDtoList = new ArrayList<>();
+            for (Reader reader : readers) {
+                readerDtoList.add(ReaderDto.builder()
+                        .id(reader.getId())
+                        .fio(reader.getFio())
+                        .email(reader.getEmail())
+                        .username(reader.getUsername())
+                        .isArchived(reader.getIsArchived())
+                        .build()
+                );
             }
-            return ResponseEntity.ok(readerDtos);
+            return ResponseEntity.ok(readerDtoList);
         }
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<?> updateReader(@PathVariable(name="id") Long id, @RequestBody Reader upReader) {
-        if(id.equals(upReader.getId())) {
-            if (readerService.read(id).isPresent()) {
-                readerService.update(upReader);
-                return new ResponseEntity<>(HttpStatus.OK);
-            }
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    @PutMapping
+    public ResponseEntity<?> updateReader(@RequestBody Reader upReader) {
+        if (readerService.read(upReader.getId()).isPresent()) {
+            readerService.update(upReader);
+            return new ResponseEntity<>(HttpStatus.OK);
         }
-        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
     @DeleteMapping("/{id}")
