@@ -20,17 +20,16 @@ import java.util.List;
 public class EmailController {
 
     private final EmailService emailService;
-    private final LogbookService logbookService;
 
-    public ResponseEntity<?> sendEmail(@PathParam("email") String email, @PathParam("subject") String subject, @PathParam("message") String message) {
+    /*public ResponseEntity<?> sendEmail(@PathParam("email") String email, @PathParam("subject") String subject, @PathParam("message") String message) {
         if(!email.isEmpty() && !subject.isEmpty() && !message.isEmpty()) {
             emailService.sendEmail(email, subject, message);
             return new ResponseEntity<>(HttpStatus.OK);
         }
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-    }
+    }*/
 
-    @GetMapping
+    /*@GetMapping
     public ResponseEntity<?> sendEmailToAll() {
         List<Logbook> logbooks = logbookService.readAll();
         String subject = "Просрочка";
@@ -49,6 +48,12 @@ public class EmailController {
             }
             sendEmail(logbook.getReader().getEmail(), subject, message);
         }
+        return new ResponseEntity<>(HttpStatus.OK);
+    }*/
+
+    @GetMapping
+    public ResponseEntity<?> sendEmailToAll() {
+        emailService.sendEmailToAll();
         return new ResponseEntity<>(HttpStatus.OK);
     }
 }

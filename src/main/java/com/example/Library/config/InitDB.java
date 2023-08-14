@@ -76,10 +76,10 @@ public class InitDB {
 
 
 
-        Book book = bookService.read(1L).orElseThrow();
-        Book book1 = bookService.read(2L).orElseThrow();
-        Book book2 = bookService.read(3L).orElseThrow();
-        Book book3 = bookService.read(4L).orElseThrow();
+        Book book = bookService.read(1L);
+        Book book1 = bookService.read(2L);
+        Book book2 = bookService.read(3L);
+        Book book3 = bookService.read(4L);
 
     }
 }
