@@ -10,10 +10,12 @@ import java.util.List;
 import java.util.Optional;
 
 public interface LogbookService {
-    void create(Logbook newLogbook);
-    Optional<Logbook> read(LogbookKey id);
+    void create(LogbookKey newLogbookKey);
+    Logbook read(LogbookKey id);
+    LogbookDto readDto(LogbookKey id);
+    List<LogbookDto> readAllDto();
     List<Logbook> readAll();
-    List<Logbook> readReadersLogbooks(Reader reader);
+    List<LogbookDto> readReadersLogbooks(/*Reader reader*/);
     void update(Logbook updateLogbook);
     void delete(LogbookKey id);
 

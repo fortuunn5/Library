@@ -13,6 +13,7 @@ import java.util.Set;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 public class Book {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -26,6 +27,7 @@ public class Book {
     @Column(name="year", nullable = false)
     private Integer year;
     @Column(nullable = false)
+    @Builder.Default
     private Boolean isArchived = false;
 
     @OneToMany(mappedBy = "book")

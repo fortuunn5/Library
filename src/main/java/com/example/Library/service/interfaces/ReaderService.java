@@ -10,8 +10,9 @@ import java.util.Optional;
 @Service
 public interface ReaderService {
     void create(Reader newReader);
-    Optional<Reader> read(Long id);
-    List<Reader> readAll();
+    Reader read(Long id);
+    ReaderDto readDto(Long id);
+    List<ReaderDto> readAll();
     void update(Reader updateReader);
     void delete(Long id);
 

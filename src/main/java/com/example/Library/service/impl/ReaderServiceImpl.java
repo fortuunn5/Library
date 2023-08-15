@@ -1,13 +1,15 @@
 package com.example.Library.service.impl;
 
+import com.example.Library.exception.NotFoundException;
+import com.example.Library.dto.ReaderDto;
 import com.example.Library.model.Reader;
 import com.example.Library.repository.ReaderRepository;
 import com.example.Library.service.interfaces.ReaderService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -16,25 +18,54 @@ public class ReaderServiceImpl implements ReaderService {
 
     @Override
     public void create(Reader newReader) {
-        if(readerRepository.findByEmail(newReader.getEmail()).isEmpty()) {
+        List<Reader> readers = readerRepository.findAll();
+        boolean isExist;
+        isExist = readers.stream().anyMatch(x -> x.equals(newReader));
+        if (!isExist) {
             readerRepository.save(newReader);
         }
+        else
+            throw new IllegalArgumentException();
     }
 
     @Override
-    public Optional<Reader> read(Long id) {
-        return readerRepository.findById(id);
+    public Reader read(Long id) {
+        return readerRepository.findById(id).orElseThrow(NotFoundException::new);
     }
 
     @Override
-    public List<Reader> readAll() {
-        return readerRepository.findAll();
+    public ReaderDto readDto(Long id) {
+        Reader reader = readerRepository.findById(id).orElseThrow(NotFoundException::new);
+        return ReaderDto.builder()
+                .id(id)
+                .fio(reader.getFio())
+                .email(reader.getEmail())
+                .username(reader.getUsername())
+                .isArchived(reader.getIsArchived())
+                .build();
+    }
+
+    @Override
+    public List<ReaderDto> readAll() {
+        List<Reader> readers = readerRepository.findAll();
+        List<ReaderDto> readerDtoList = new ArrayList<>();
+        for (Reader reader : readers) {
+            readerDtoList.add(ReaderDto.builder()
+                    .id(reader.getId())
+                    .fio(reader.getFio())
+                    .email(reader.getEmail())
+                    .username(reader.getUsername())
+                    .isArchived(reader.getIsArchived())
+                    .build()
+            );
+        }
+        return readerDtoList;
     }
 
     @Override
     public void update(Reader updateReader) {
 
-        Reader reader = readerRepository.findById(updateReader.getId()).orElseThrow();
+        Reader reader = readerRepository.findById(updateReader.getId()).orElseThrow(NotFoundException::new);
 
         if(updateReader.getFio() != null && !updateReader.getFio().isBlank()) {
             reader.setFio(updateReader.getFio());
@@ -59,19 +90,15 @@ public class ReaderServiceImpl implements ReaderService {
 
     @Override
     public void delete(Long id) {
-        Reader reader = readerRepository.findById(id).orElseThrow();
+        Reader reader = readerRepository.findById(id).orElseThrow(NotFoundException::new);
         reader.setIsArchived(true);
         readerRepository.save(reader);
     }
 
 
-    public String getEmail(Long id) {
-        return readerRepository.findById(id).orElseThrow().getEmail();
-    }
-
     @Override
     public Reader readByUsername(String username) {
-        return readerRepository.findByUsername(username).orElseThrow();
+        return readerRepository.findByUsername(username).orElseThrow(NotFoundException::new);
     }
 
 

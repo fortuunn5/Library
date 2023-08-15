@@ -70,16 +70,16 @@ public class InitDB {
                 1929
         ));
 
-        reader0=readerService.read(1L).orElseThrow();
-        reader1=readerService.read(2L).orElseThrow();
-        reader2=readerService.read(3L).orElseThrow();
+        reader0=readerService.read(1L);
+        reader1=readerService.read(2L);
+        reader2=readerService.read(3L);
 
 
 
-        Book book = bookService.read(1L).orElseThrow();
-        Book book1 = bookService.read(2L).orElseThrow();
-        Book book2 = bookService.read(3L).orElseThrow();
-        Book book3 = bookService.read(4L).orElseThrow();
+        Book book = bookService.read(1L);
+        Book book1 = bookService.read(2L);
+        Book book2 = bookService.read(3L);
+        Book book3 = bookService.read(4L);
 
     }
 }
