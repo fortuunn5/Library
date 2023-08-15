@@ -70,9 +70,9 @@ public class InitDB {
                 1929
         ));
 
-        reader0=readerService.read(1L).orElseThrow();
-        reader1=readerService.read(2L).orElseThrow();
-        reader2=readerService.read(3L).orElseThrow();
+        reader0=readerService.read(1L);
+        reader1=readerService.read(2L);
+        reader2=readerService.read(3L);
 
 
 

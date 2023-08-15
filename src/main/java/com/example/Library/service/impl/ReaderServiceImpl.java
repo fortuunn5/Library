@@ -24,7 +24,8 @@ public class ReaderServiceImpl implements ReaderService {
         if (!isExist) {
             readerRepository.save(newReader);
         }
-        throw new IllegalArgumentException();
+        else
+            throw new IllegalArgumentException();
     }
 
     @Override
@@ -94,10 +95,6 @@ public class ReaderServiceImpl implements ReaderService {
         readerRepository.save(reader);
     }
 
-
-    public String getEmail(Long id) {
-        return readerRepository.findById(id).orElseThrow(NotFoundException::new).getEmail();
-    }
 
     @Override
     public Reader readByUsername(String username) {

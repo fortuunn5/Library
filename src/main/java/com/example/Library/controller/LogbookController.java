@@ -29,27 +29,14 @@ public class LogbookController {
     private final BookService bookService;
 
     @PostMapping
-    //TODO: fix
     public ResponseEntity<?> createLogbook(@RequestBody LogbookKey newLogbookKey) {
-        Reader reader = readerService.read(newLogbookKey.getReaderId());
-        Book book = bookService.read(newLogbookKey.getBookId());
-
-        if (reader.getIsArchived() || book.getIsArchived()) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
-
-        Logbook logbook = Logbook.builder()
-                .id(newLogbookKey)
-                .reader(reader)
-                .book(book)
-                .build();
         logbookService.create(newLogbookKey);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
     @GetMapping
     public ResponseEntity<LogbookDto> readLogbook(@RequestBody LogbookKey id) {
-            return ResponseEntity.ok(logbookService.readDto(id));
+        return ResponseEntity.ok(logbookService.readDto(id));
     }
 
     @GetMapping("/all")

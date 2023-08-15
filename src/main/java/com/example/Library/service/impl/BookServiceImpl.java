@@ -24,7 +24,8 @@ public class BookServiceImpl implements BookService {
         if (!isExist) {
             bookRepository.save(newBook);
         }
-        throw new IllegalArgumentException();
+        else
+            throw new IllegalArgumentException();
     }
 
     @Override

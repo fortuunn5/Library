@@ -54,7 +54,8 @@ public class LogbookServiceImpl implements LogbookService {
                     .build();
             logbookRepository.save(newLogbook);
         }
-        throw new IllegalArgumentException();
+        else
+            throw new IllegalArgumentException();
     }
 
     @Override
@@ -75,6 +76,7 @@ public class LogbookServiceImpl implements LogbookService {
         BookDto bookDto = BookDto.builder()
                 .id(logbook.getBook().getId())
                 .name(logbook.getBook().getName())
+                .author(logbook.getBook().getAuthor())
                 .year(logbook.getBook().getYear())
                 .isArchived(logbook.getBook().getIsArchived())
                 .build();
